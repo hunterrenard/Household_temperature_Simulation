@@ -2,15 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+# set a random seeD
+# np.random.seed(213)
+
 delta_t = 5 / 60 												# hr
 time_values = np.arange(0, 91 * 24, delta_t)
-change_over_time = time_values * 1.5 / 91
+change_over_time = time_values * 2 / 91
 
 # Outside Temperature
-a = 6 * np.sin(2 * math.pi * time_values) + 35
+a = 6 * np.sin(2 * math.pi * (time_values)) + 35
 b = np.random.normal(0, .1, len(time_values))
 
 outside_temperature = a + b.cumsum() + change_over_time
+# First week is 11 degrees
+# outside_temperature[0: 2016] = 11
 
 # Thermostat - furnace
 work_furnace = np.repeat(68, 9 / delta_t)
@@ -25,6 +30,9 @@ post_vac_furnace = np.tile(one_day_furnace, 40)
 
 furnace = np.concatenate([pre_vac_furnace, vacaction_furnace, post_vac_furnace])
 
+# set heating to 80
+# furnace = np.repeat(80, len(time_values))
+
 #Thermostat - A/C
 work_AC = np.repeat(82, 9 / delta_t)
 home_AC = np.repeat(79, 6 / delta_t)
@@ -38,6 +46,8 @@ post_vac_AC = np.tile(one_day_AC, 40)
 
 AC = np.concatenate([pre_vac_AC, vacaction_AC, post_vac_AC])
 
+# Set cooling to 70
+# AC = np.repeat(70, len(time_values))
 # variables
 furnace_rate = 2											 	# degF / hr
 AC_rate = 1.5												 	# degF / hr
@@ -96,8 +106,9 @@ for i in range(1, len(time_values)):
 		
 # utility cost
 furnace_cost = furnace_on.sum() * (furnace_cost_rate * delta_t)								# dollar
-AC_cost = AC_on.sum() * (AC_cost_rate * delta_t)										# dollar
-print("estimated average monthly utility cost (in U.S. dollars): $" + str(furnace_cost + AC_cost))
+AC_cost = AC_on.sum() * (AC_cost_rate * delta_t)									# dollar
+print("estimated average monthly utility cost (in U.S. dollars): $" + str((furnace_cost + AC_cost) / 3))
+print("estimated total utility cost (in U.S. dollars): $" + str((furnace_cost + AC_cost)))
 
 # Plotting
 plt.plot(time_values, outside_temperature, color='green', linestyle="-", label="Outside Temperature")
